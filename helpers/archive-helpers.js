@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -25,17 +26,73 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, function(err, data) {
+    callback(String(data).split('\n'));
+  });
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(url, callback) {
+  exports.readListOfUrls(function(urls) {
+    if (urls.indexOf(url) !== -1) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url, callback) {
+  exports.isUrlInList(url, function(exists) {
+    if (exists) {
+      callback();
+    } else {
+      fs.appendFile(exports.paths.list, url + '\n', function(err) {
+        if (err) {
+          throw err;
+        }
+
+        callback();
+      });
+    }
+  });
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, callback) {
+  fs.readdir(exports.paths.archivedSites, function(err, files) {
+    if (err) {
+      throw err;
+    }
+
+    if (files.indexOf(url) !== -1) {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(urls) {
+  urls.forEach(function(url) {
+    var options = {
+      host: url
+    };
+
+    http.request(options, function(response) {
+      var data = '';
+
+      response.on('data', function(chunk) {
+        data += chunk;
+      });
+
+      response.on('end', function() {
+        fs.writeFile(exports.paths.archivedSites + '/' + url, data, function(err) {
+          if (err) {
+            throw err;
+          }
+        });
+      });
+    }).end();
+  });
+
 };
