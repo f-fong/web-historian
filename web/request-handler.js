@@ -30,6 +30,33 @@ var routeActions = {
     }
   },
   'POST': function(req, res) {
+    var data = '';
+    
+    req.on('data', function(chunk) {
+      data += chunk;
+    });
+
+    req.on('end', function() {
+      data = data.slice(4);
+      archive.isUrlArchived(data, function(exists) {
+        console.log(1);
+        console.log(data);
+        if (exists) {
+          helpers.sendContent(res, data, 302);
+        } else {
+          console.log(2);
+          archive.isUrlInList(data, function(exists) {
+            console.log(3);
+            if (!exists) {
+              archive.addUrlToList(data, function() {});
+            }
+            helpers.serveAssets(res, 'loading.html', 302);
+          });
+        }
+      });
+    });
+
+    // if (archive.isUrlInList(req.url, function() {}))
 
   }
 };

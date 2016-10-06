@@ -56,6 +56,9 @@ describe('server', function() {
       it('should append submitted sites to \'sites.txt\'', function(done) {
         var url = 'www.example.com';
 
+        // TODO erase all files inside sites?
+        console.log('please', fs.readFileSync(archive.paths.archivedSites + '/' + url, { encoding: 'utf8'}));
+
         // Reset the test file and process request
         fs.closeSync(fs.openSync(archive.paths.list, 'w'));
 

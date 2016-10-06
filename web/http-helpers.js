@@ -10,8 +10,9 @@ exports.headers = {
   'Content-Type': 'text/html'
 };
 
-exports.serveAssets = function(res, asset, callback) {
-  res.writeHead(200, exports.headers);
+exports.serveAssets = function(res, asset, statusCode) {
+  var code = statusCode || 200;
+  res.writeHead(code, exports.headers);
   fs.readFile(path.join(__dirname, 'public/', asset), function(err, contents) {
     if (err) {
       throw err;
@@ -21,15 +22,16 @@ exports.serveAssets = function(res, asset, callback) {
   });
 };
 
-exports.sendContent = function(res, url) {
+exports.sendContent = function(res, url, statusCode) {
   // read file at archives/sites/<url>
   // send back contents to response
+  var code = statusCode || 200;
   fs.readFile(archive.paths.archivedSites + '/' + url, function(err, contents) {
     if (err) {
       throw err;
     }
 
-    res.writeHead(200, exports.headers);
+    res.writeHead(code, exports.headers);
 
     res.end(contents);
   });

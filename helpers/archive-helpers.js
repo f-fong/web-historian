@@ -65,6 +65,18 @@ exports.isUrlArchived = function(url, callback) {
     }
 
     if (files.indexOf(url) !== -1) {
+      // REMOVE ME
+      console.log('calling with true');
+      console.log(files);
+      exports.isUrlInList(url, function(exists) {
+        if (exists) {
+          console.log(url, 'is also in the list');
+        } else {
+          console.log(url, 'is NOT in the list');
+        }
+      });
+      // 
+
       callback(true);
     } else {
       callback(false);
