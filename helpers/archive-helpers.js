@@ -90,6 +90,8 @@ exports.downloadUrls = function(urls) {
           if (err) {
             throw err;
           }
+          // consider testing for this in the future
+          exports.addUrlToList(url, function() { });
         });
       });
     }).end();

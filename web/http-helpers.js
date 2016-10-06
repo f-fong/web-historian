@@ -11,11 +11,31 @@ exports.headers = {
 };
 
 exports.serveAssets = function(res, asset, callback) {
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
+  res.writeHead(200, exports.headers);
+  fs.readFile(path.join(__dirname, 'public/', asset), function(err, contents) {
+    if (err) {
+      throw err;
+    }
+
+    res.end(contents);
+  });
 };
 
+exports.sendContent = function(res, url) {
+  // read file at archives/sites/<url>
+  // send back contents to response
+  fs.readFile(archive.paths.archivedSites + '/' + url, function(err, contents) {
+    if (err) {
+      throw err;
+    }
 
+    res.writeHead(200, exports.headers);
 
-// As you progress, keep thinking about what helper functions you can put here!
+    res.end(contents);
+  });
+};
+
+exports.send404 = function(res) {
+  res.writeHead(404, exports.headers);
+  res.end('404 not found lol');
+};
