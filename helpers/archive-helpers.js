@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var http = require('http');
+var request = require('request');
+var querystring = require('querystring');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -66,16 +68,15 @@ exports.isUrlArchived = function(url, callback) {
 
     if (files.indexOf(url) !== -1) {
       // REMOVE ME
-      console.log('calling with true');
-      console.log(files);
-      exports.isUrlInList(url, function(exists) {
-        if (exists) {
-          console.log(url, 'is also in the list');
-        } else {
-          console.log(url, 'is NOT in the list');
-        }
-      });
-      // 
+      // console.log('calling with true');
+      // console.log(files);
+      // exports.isUrlInList(url, function(exists) {
+      //   if (exists) {
+      //     console.log(url, 'is also in the list');
+      //   } else {
+      //     console.log(url, 'is NOT in the list');
+      //   }
+      // });
 
       callback(true);
     } else {
@@ -86,27 +87,45 @@ exports.isUrlArchived = function(url, callback) {
 
 exports.downloadUrls = function(urls) {
   urls.forEach(function(url) {
-    var options = {
-      host: url
-    };
+    var unescapedUrl = querystring.unescape(url);
 
-    http.request(options, function(response) {
-      var data = '';
+    // console.log('about to send request 0000000000000');
+    // http.request(options, function(response) {
+    //   console.log('getting response');
+    //   var data = '';
 
-      response.on('data', function(chunk) {
-        data += chunk;
+    //   response.on('data', function(chunk) {
+    //     data += chunk;
+    //   });
+
+    //   response.on('end', function() {
+    //     fs.writeFile(exports.paths.archivedSites + '/' + url, data, function(err) {
+    //       if (err) {
+    //         throw err;
+    //       }
+    //       // consider testing for this in the future
+    //       exports.addUrlToList(url, function() { });
+    //     });
+    //   });
+    // }).end();
+
+    request(unescapedUrl, function (err, res, body) {
+      if (err) {
+        throw err;
+      }
+
+      console.log(body);
+      fs.writeFile(exports.paths.archivedSites + '/' + url, body, function(err) {
+        if (err) {
+          throw err;
+        }
+      
+        exports.addUrlToList(url, function() { });
       });
+    });
 
-      response.on('end', function() {
-        fs.writeFile(exports.paths.archivedSites + '/' + url, data, function(err) {
-          if (err) {
-            throw err;
-          }
-          // consider testing for this in the future
-          exports.addUrlToList(url, function() { });
-        });
-      });
-    }).end();
+
+
   });
 
 };

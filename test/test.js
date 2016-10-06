@@ -57,7 +57,14 @@ describe('server', function() {
         var url = 'www.example.com';
 
         // TODO erase all files inside sites?
-        console.log('please', fs.readFileSync(archive.paths.archivedSites + '/' + url, { encoding: 'utf8'}));
+        // console.log('please', fs.readFileSync(archive.paths.archivedSites + '/' + url, { encoding: 'utf8'}));
+
+        var files = fs.readdirSync(archive.paths.archivedSites);
+
+        for (var i = 0; i < files.length; i++) {
+          var currentFilePath = archive.paths.archivedSites + '/' + files[i];
+          fs.unlinkSync(currentFilePath);
+        }
 
         // Reset the test file and process request
         fs.closeSync(fs.openSync(archive.paths.list, 'w'));
