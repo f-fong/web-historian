@@ -56,17 +56,13 @@ describe('server', function() {
       it('should append submitted sites to \'sites.txt\'', function(done) {
         var url = 'www.example.com';
 
-        // TODO erase all files inside sites?
-        // console.log('please', fs.readFileSync(archive.paths.archivedSites + '/' + url, { encoding: 'utf8'}));
-
         var files = fs.readdirSync(archive.paths.archivedSites);
 
         for (var i = 0; i < files.length; i++) {
           var currentFilePath = archive.paths.archivedSites + '/' + files[i];
           fs.unlinkSync(currentFilePath);
         }
-
-        // Reset the test file and process request
+       
         fs.closeSync(fs.openSync(archive.paths.list, 'w'));
 
         request
@@ -80,6 +76,47 @@ describe('server', function() {
             }
 
             done(err);
+          });
+      });
+
+      it('should return an archived site if that url has already been archived', function(done) {
+        var fixtureName = 'www.LLAMA.com';
+        var fixturePath = archive.paths.archivedSites + '/' + fixtureName;
+        var fixtureData = 'LLAMA';
+
+        fs.writeFileSync(fixturePath, fixtureData);
+
+        request
+          .post('/')
+          .type('form')
+          .send({url: fixtureName})
+          .expect(302, function(err, response) {
+            if (!err) {
+              expect(response.text).to.equal(fixtureData);
+              fs.unlinkSync(fixturePath);
+            }
+
+            done(err);
+          });
+      });
+
+      it('should serve loading.html back after submitting a new site', function(done) {
+        request
+          .post('/')
+          .type('form')
+          .send({ url: 'www.wikipedia.org'})
+          .expect(302, function(err, response) {
+            if (err) {
+              throw err;
+            }
+
+            fs.readFile(path.join(__dirname, '../web/public/loading.html'), 'utf8', function(err, contents) {
+              if (err) {
+                throw err;
+              }
+              expect(contents).to.equal(response.text);
+              done(err);
+            });            
           });
       });
     });

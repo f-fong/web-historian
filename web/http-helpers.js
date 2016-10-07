@@ -23,8 +23,6 @@ exports.serveAssets = function(res, asset, statusCode) {
 };
 
 exports.sendContent = function(res, url, statusCode) {
-  // read file at archives/sites/<url>
-  // send back contents to response
   var code = statusCode || 200;
   fs.readFile(archive.paths.archivedSites + '/' + url, function(err, contents) {
     if (err) {

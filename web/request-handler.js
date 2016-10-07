@@ -16,11 +16,7 @@ var routeActions = {
     } else {
       var url = req.url.slice(1);
 
-      // check if in archive
-        // if yes, send back
-        // if not, send a 404
       archive.isUrlInList(url, function(exists) {
-        // helpers.sendContent(res, url);
         if (exists) {
           helpers.sendContent(res, url);
         } else {
@@ -39,14 +35,10 @@ var routeActions = {
     req.on('end', function() {
       data = data.slice(4);
       archive.isUrlArchived(data, function(exists) {
-        console.log(1);
-        console.log(data);
         if (exists) {
           helpers.sendContent(res, data, 302);
         } else {
-          console.log(2);
           archive.isUrlInList(data, function(exists) {
-            console.log(3);
             if (!exists) {
               archive.addUrlToList(data, function() {});
             }
@@ -65,18 +57,4 @@ exports.handleRequest = function (req, res) {
   if (routeActions[req.method]) {
     routeActions[req.method](req, res);
   }
-
-  // us/server-facing
-    // check for archived sites
-    // add sites to be archived
-    // return archived sites
-
-  // get request for google.com
-    // go into archives/sites/ and find google
-    // send that file back
-
-
-
-
-  // res.end(archive.paths.list);
 };
