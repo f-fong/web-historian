@@ -7,6 +7,8 @@
 */
 
 var archive = require('../helpers/archive-helpers');
+var fs = require('fs');
+var path = require('path');
 
 archive.readListOfUrls(function(urls) {
   var downloadQ = [];
@@ -16,16 +18,13 @@ archive.readListOfUrls(function(urls) {
     (function(url, index) {
       archive.isUrlArchived(url, function(exists) {
         if (!exists && url) {
-          console.log('going to push to downloadQ:', urls[index]);
           downloadQ.push(urls[index]);
         } 
 
         if (index === urls.length - 1) {
-          console.log('going to download the following:', downloadQ);
           archive.downloadUrls(downloadQ);
         }
       });  
     })(url, i);
-
   }
 });

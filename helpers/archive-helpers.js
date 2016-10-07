@@ -67,17 +67,6 @@ exports.isUrlArchived = function(url, callback) {
     }
 
     if (files.indexOf(url) !== -1) {
-      // REMOVE ME
-      // console.log('calling with true');
-      // console.log(files);
-      // exports.isUrlInList(url, function(exists) {
-      //   if (exists) {
-      //     console.log(url, 'is also in the list');
-      //   } else {
-      //     console.log(url, 'is NOT in the list');
-      //   }
-      // });
-
       callback(true);
     } else {
       callback(false);
@@ -88,33 +77,15 @@ exports.isUrlArchived = function(url, callback) {
 exports.downloadUrls = function(urls) {
   urls.forEach(function(url) {
     var unescapedUrl = querystring.unescape(url);
-
-    // console.log('about to send request 0000000000000');
-    // http.request(options, function(response) {
-    //   console.log('getting response');
-    //   var data = '';
-
-    //   response.on('data', function(chunk) {
-    //     data += chunk;
-    //   });
-
-    //   response.on('end', function() {
-    //     fs.writeFile(exports.paths.archivedSites + '/' + url, data, function(err) {
-    //       if (err) {
-    //         throw err;
-    //       }
-    //       // consider testing for this in the future
-    //       exports.addUrlToList(url, function() { });
-    //     });
-    //   });
-    // }).end();
+    if (unescapedUrl.slice(0, 4) !== 'http') {
+      unescapedUrl = 'http://' + unescapedUrl;
+    }
 
     request(unescapedUrl, function (err, res, body) {
       if (err) {
         throw err;
       }
 
-      console.log(body);
       fs.writeFile(exports.paths.archivedSites + '/' + url, body, function(err) {
         if (err) {
           throw err;
@@ -123,8 +94,6 @@ exports.downloadUrls = function(urls) {
         exports.addUrlToList(url, function() { });
       });
     });
-
-
 
   });
 
